@@ -1,0 +1,151 @@
+
+========================================================================
+1. DATASET
+========================================================================
+Loaded 380 feedback comments from feedback_dataset.csv
+
+Sentiment counts:
+sentiment
+Negative    152
+Positive    132
+Neutral      96
+
+Aspect counts:
+aspect
+Administration    76
+Exams             76
+Course Content    76
+Teaching          76
+Facilities        76
+
+First 5 rows:
+                                                               feedback         aspect sentiment
+                                  I think the timetable is very prompt. Administration  Positive
+To be frank, the grading is well organized, so I never had any problem.          Exams  Positive
+                                     The practical exams are just okay.          Exams   Neutral
+                                       The assignments are really fair.          Exams  Positive
+                          I think the subjects are quite comprehensive. Course Content  Positive
+
+========================================================================
+2. NLP PRE-PROCESSING DEMO
+========================================================================
+Original text           : The syllabus is outdated and the lab computers don't work properly.
+Cleaned text            : the syllabus is outdated and the lab computers do not work properly.
+Tokens                  : ['the', 'syllabus', 'is', 'outdated', 'and', 'the', 'lab', 'computers', 'do', 'not', 'work', 'properly']
+After stop-word removal : ['syllabus', 'outdated', 'lab', 'computers', 'not', 'work', 'properly']
+Stemmed (Porter)        : ['syllabu', 'outdat', 'lab', 'comput', 'not', 'work', 'properli']
+Lemmatized              : ['syllabus', 'outdated', 'lab', 'computer', 'not', 'work', 'properly']
+POS tags                : [('the', 'DT'), ('syllabus', 'NN'), ('is', 'VBZ'), ('outdated', 'VBN'), ('and', 'CC'), ('the', 'DT'), ('lab', 'NN'), ('computers', 'NNS'), ('do', 'VBP'), ('not', 'RB'), ('work', 'VB'), ('properly', 'RB')]
+------------------------------------------------------------------------
+Original text           : Exams were not fair, the question paper was too lengthy!
+Cleaned text            : exams were not fair, the question paper was too lengthy!
+Tokens                  : ['exams', 'were', 'not', 'fair', 'the', 'question', 'paper', 'was', 'too', 'lengthy']
+After stop-word removal : ['exams', 'not', 'fair', 'question', 'paper', 'too', 'lengthy']
+Stemmed (Porter)        : ['exam', 'not', 'fair', 'question', 'paper', 'too', 'lengthi']
+Lemmatized              : ['exam', 'not', 'fair', 'question', 'paper', 'too', 'lengthy']
+POS tags                : [('exams', 'NNS'), ('were', 'VBD'), ('not', 'RB'), ('fair', 'JJ'), ('the', 'DT'), ('question', 'NN'), ('paper', 'NN'), ('was', 'VBD'), ('too', 'RB'), ('lengthy', 'JJ')]
+------------------------------------------------------------------------
+
+========================================================================
+3. TRAINING AND EVALUATION
+========================================================================
+Training models (80% train / 20% test) ...
+
+Model comparison on the test set:
+                          Model  Accuracy  Precision  Recall  F1-score
+   Logistic Regression (TF-IDF)     0.882      0.885   0.868     0.874
+           Naive Bayes (TF-IDF)     0.855      0.862   0.842     0.848
+     Naive Bayes (Bag of Words)     0.829      0.824   0.821     0.821
+VADER (rule-based, no training)     0.592      0.614   0.584     0.587
+
+Best model: Logistic Regression (TF-IDF)
+5-fold cross-validation F1 (best model): 0.844 +/- 0.038
+
+Classification report - sentiment (best model, test set):
+              precision    recall  f1-score   support
+
+    Negative       0.86      0.97      0.91        31
+     Neutral       0.88      0.79      0.83        19
+    Positive       0.92      0.85      0.88        26
+
+    accuracy                           0.88        76
+   macro avg       0.89      0.87      0.87        76
+weighted avg       0.88      0.88      0.88        76
+
+Aspect classifier accuracy (test set): 0.882
+
+Classification report - aspect:
+                precision    recall  f1-score   support
+
+Administration       0.81      0.87      0.84        15
+Course Content       0.93      0.93      0.93        15
+         Exams       0.92      0.73      0.81        15
+    Facilities       0.89      1.00      0.94        16
+      Teaching       0.87      0.87      0.87        15
+
+      accuracy                           0.88        76
+     macro avg       0.88      0.88      0.88        76
+  weighted avg       0.88      0.88      0.88        76
+
+
+========================================================================
+4. INSIGHTS FROM THE FEEDBACK
+========================================================================
+Satisfaction per aspect:
+sentiment       Positive  Neutral  Negative  Total  Satisfaction Index
+aspect                                                                
+Teaching              38       20        18     76                26.3
+Administration        28       18        30     76                -2.6
+Course Content        26       20        30     76                -5.3
+Exams                 22       20        34     76               -15.8
+Facilities            18       18        40     76               -28.9
+
+Top complaint phrases (bigrams in negative comments):
+    7  too lengthy
+    6  exam schedule
+    5  campus infrastructure
+    5  not helpful
+    5  drink water
+    4  water facility
+    4  student support
+    4  support service
+
+Top praise phrases (bigrams in positive comments):
+    9  well organize
+    5  mark scheme
+    5  well maintain
+    5  keep student
+    5  student motivate
+    5  teach quality
+    5  grievance system
+    4  never problem
+
+Most frequent opinion words (adjectives found with POS tagging):
+acceptable (14), helpful (14), excellent (14), practical (13), fine (13), good (13), bad (11), ordinary (11), moderate (10), decent (9), lengthy (8), okay (7)
+
+========================================================================
+5. SAVING CHARTS
+========================================================================
+  saved  outputs\01_sentiment_distribution.png
+  saved  outputs\02_aspect_sentiment.png
+  saved  outputs\03_satisfaction_index.png
+  saved  outputs\04_model_comparison.png
+  saved  outputs\05_confusion_matrix_sentiment.png
+  saved  outputs\06_confusion_matrix_aspect.png
+  saved  outputs\07_top_complaints.png
+  saved  outputs\08_top_praises.png
+  saved  outputs\09_wordcloud.png
+
+========================================================================
+6. PREDICTIONS ON NEW COMMENTS
+========================================================================
+"The professors are very supportive and the classes are really engaging."
+   -> sentiment: Positive (91%)   aspect: Teaching (83%)   VADER: Positive (+0.64)
+"The syllabus is outdated and the lab computers don't work properly."
+   -> sentiment: Negative (89%)   aspect: Facilities (55%)   VADER: Neutral (+0.00)
+"Exams were not fair, the question paper was too lengthy!"
+   -> sentiment: Negative (95%)   aspect: Exams (99%)   VADER: Negative (-0.31)
+"The library opens at nine and closes at eight."
+   -> sentiment: Neutral (66%)   aspect: Facilities (66%)   VADER: Neutral (+0.00)
+"The office staff are not helpful at all."
+   -> sentiment: Negative (80%)   aspect: Administration (68%)   VADER: Negative (-0.33)
